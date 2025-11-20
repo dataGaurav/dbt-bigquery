@@ -1,0 +1,79 @@
+{% set temperature =60.0 %}
+On a daly like this, I especially like
+
+{% if temperature > 70 %}
+a refreshing lemon sorbet
+
+{% else %}
+a decadent chocolate cake
+
+{% endif %}
+
+
+
+
+
+
+{% for j in range(26) %}
+  select {{ j }} as number  {% if not loop.last %} union all {% endif %}
+{% endfor %}
+
+
+
+
+
+{#
+
+{% set cool_string = 'Wow cool beans' %}
+{% set my_second_cool_string = 'This is jinja' %}
+{% set my_fav_num = 26 %}
+
+{{ cool_string }} {{ my_second_cool_string}} i want to write jinja for {{ my_fav_num }} years!
+
+#}
+
+
+
+
+{% set animals = ['cat', 'dog', 'elephant', 'rhino'] %}
+
+{{ animals[0] }}
+{{ animals[1] }}
+{{ animals[2] }}
+
+{% for animal in animals %}
+    my favorite animal is the {{ animal }}
+
+{% endfor %}
+
+
+
+
+{% set foods = ['radish', 'carrot', 'celery', 'cabbage'] %}
+
+{%- for food in foods -%}
+    {% if food = 'celery' %}
+        {%- set food_type = 'snack' -%}
+    {% else %}
+        {%- set food_type = 'vegetable' -%}
+
+    {% endif %}
+
+    The delicious {{ food }} is my favorite {{ food_type }}
+
+{% endfor %}
+
+
+{% set jennas_dictionary = {
+    'wprd': 'data',
+    'part_of_speech': 'noun',
+    'definition': 'the building blocks of information',
+} %}
+
+{{ jennas_dictionary['word'] }}
+
+{{ jennas_dictionary['word'] }} ({{ jennas_dictionary['part_of_speech'] }}): defined as "{{ jennas_dictionary['definition'] }}".
+
+
+
+select * from {{ ref('stg')}}

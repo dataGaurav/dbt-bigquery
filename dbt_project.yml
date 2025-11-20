@@ -39,6 +39,7 @@ models:
   admin_maturity:
     staging:
       +materialized: view
+      +schema: staging 
     
     marts:
       +materialized: table
