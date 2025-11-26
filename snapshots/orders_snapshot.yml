@@ -1,0 +1,22 @@
+# snapshots:
+#   - name: orders_snapshot
+#     relation: source('jaffle_shop', 'orders')
+#     config:
+#       schema: "{{ target.schema }}"
+#       database: "{{ target.database }}"
+#       unique_key: id
+#       strategy: check
+#       check_cols: all
+#       hard_deletes: ignore
+
+snapshots:
+  - name: orders_snapshots
+    relation: source('jaffle_shop', 'orders')
+    config:
+      schema: "{{ target.schema }}"
+      database: "{{ target.database }}"
+      unique_key: id
+      strategy: timestamp
+      updated_at: "_etl_loaded_at"
+      hard_deletes: ignore
+      dbt_valid_to_current: "date('9999-12-31')"

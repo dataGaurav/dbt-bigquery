@@ -13,4 +13,4 @@
 
 {% endmacro %}
 
---dbt run-operation unioned_tables --args '{"database": "data-platforms-team-sandbox", "schema": "dbt_gpoojary", "prefix": "stg_jaffle_shop__"}'
+--dbt run-operation union_tables_by_prefix --args '{"database": "data-platforms-team-sandbox", "schema": "dbt_gpoojary", "prefix": "stg_jaffle_shop__"}'
