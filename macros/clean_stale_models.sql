@@ -30,3 +30,5 @@
     {% endfor %}
 
 {% endmacro %}
+
+--dbt run-operation clean_stale_models
