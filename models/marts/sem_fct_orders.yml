@@ -1,0 +1,33 @@
+semantic_models:
+  - name: sem_fct_orders
+    description: semantic model for fct_orders 
+    model: ref('fct_orders')
+    defaults:
+      agg_time_dimension: order_date
+    entities:
+    - name: order_id
+      type: primary
+    - name: customer_id
+      type: foreign
+    dimensions:
+    - name: order_date
+      type: time
+      type_params:
+        time_granularity: day
+    measures:
+      - name: amount
+        description: amount paid in each order
+        agg: sum
+
+metrics:
+  - name: order_total
+    description: Sum of orders value
+    type: simple
+    label: Order Total
+    type_params:
+      measure:
+        name: amount
+        filter: |
+          {{ Dimension('sem_fct_orders__order_date') }} >= '2020-01-01'
+    meta:
+      owner: '@analytics'

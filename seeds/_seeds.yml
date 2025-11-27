@@ -1,0 +1,11 @@
+version: 2
+
+seeds:
+  - name: employees
+    columns:
+      - name: employee_id
+      - name: email
+      - name: customer_id
+        tests:
+          - not_null
+          - unique    
