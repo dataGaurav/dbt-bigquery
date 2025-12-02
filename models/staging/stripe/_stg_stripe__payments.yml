@@ -1,0 +1,14 @@
+version: 2
+models:
+  - name: stg_stripe__payments
+    columns:
+      - name: amount
+        tests: 
+          - greater_than_five
+          - dbt_utils.expression_is_true:
+              arguments:
+                expression: "{{ column }} <= 5"
+              config:
+                #severity: warn
+                error_if: ">=100"
+#dbt-bigquery % dbt test -s stg_stripe__payments

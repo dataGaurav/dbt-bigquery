@@ -1,0 +1,54 @@
+models:
+  - name: dim_customers
+    latest_version: 1
+
+    config:
+      contract:
+        enforced: true
+    columns:
+      - name: customer_id
+        data_type: int64
+        constraints:
+          - type: primary_key
+          - type: not_null
+
+      - name: first_name
+        data_type: string
+        constraints:
+          - type: not_null
+
+      - name: last_name
+        data_type: string
+        constraints:
+          - type: not_null
+
+      - name: first_order_date
+        data_type: date
+        constraints:
+          - type: not_null
+
+      - name: most_recent_order_date
+        data_type: date
+        
+      - name: number_of_orders
+        data_type: int64
+        constraints:
+          - type: not_null
+# model contraints (dbt run --select dim_customers)
+
+    versions: 
+      - v: 1
+        config:
+          alias: dim_customers
+      - v: 2
+        columns:
+          - name: order_date
+            data_type: date
+          - name: most_recent_order_date
+            data_type: string
+          - include: all
+            exclude: [first_order_date,most_recent_order_date]
+
+
+# select * from {{ ref('dim_customers'), v=2 }}
+

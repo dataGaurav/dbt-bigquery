@@ -1,0 +1,26 @@
+version: 2
+models:
+  - name: int_orders__pivoted
+    description: "Pivoted payments by order — one row per order with payment-method amount columns."
+    columns:
+      - name: order_id
+        description: "Primary key for the pivoted orders table"
+        tests:
+          - not_null
+          - unique
+      - name: bank_transfer_amount
+        tests:
+          - not_null
+      - name: coupon_amount
+        tests:
+          - not_null
+      - name: credit_card_amount
+        tests:
+          - not_null
+      - name: gift_card_amount
+        tests:
+          - not_null
+      - name: bitcoin_amount
+        tests:
+          - not_null
+#dbt run-operation required_tests
