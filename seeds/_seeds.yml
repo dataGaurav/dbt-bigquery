@@ -8,4 +8,9 @@ seeds:
       - name: customer_id
         tests:
           - not_null
-          - unique    
+          - unique  
+    config:
+      # grants:
+      #   select:
+      #     - roles/bigquery.dataViewer 
+      #     - roles/bigquery.jobUser    
