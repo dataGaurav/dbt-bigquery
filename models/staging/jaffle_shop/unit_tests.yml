@@ -1,0 +1,57 @@
+unit_tests:
+  - name: test_order_status_cleanup
+    description: Test my status case / when cleanup logic 
+    model: customer_orders
+    given:
+      - input: source('jaffle_shop', 'orders')
+        rows: 
+          - {id: 1, user_id: 1, status: 'returned', order_date: '2020-01-01'}
+          - {id: 2, user_id: 1, status: 'completed', order_date: '2020-01-02'}
+          - {id: 23, user_id: 2, status: 'return_pending', order_date: '2020-01-03'}
+          - {id: 72, user_id: 2, status: 'shipped', order_date: '2020-01-04'}
+          - {id: 86, user_id: 3, status: 'placed', order_date: '2020-01-05'}
+      - input: source('jaffle_shop', 'customers')
+        rows:
+          - {id: 1, first_name: 'Alice', last_name: 'Smith'}
+          - {id: 2, first_name: 'Bob', last_name: 'Jones'}
+          - {id: 3, first_name: 'Charlie', last_name: 'Brown'}
+      - input: source('stripe', 'payment')
+        rows:
+          - {orderid: 1, amount: 1000, status: 'success'}
+          - {orderid: 2, amount: 2000, status: 'success'}
+          - {orderid: 23, amount: 3000, status: 'success'}
+          - {orderid: 72, amount: 4000, status: 'success'}
+          - {orderid: 86, amount: 5000, status: 'success'}
+      
+    expect:
+      rows:
+        - {order_id: 1, order_status: 'returned'}
+        - {order_id: 2, order_status: 'completed'}
+        - {order_id: 23, order_status: 'return_pending'}
+        - {order_id: 72, order_status: 'shipped'}
+        - {order_id: 86, order_status: 'placed'} 
+  
+  - name: test_days_since_ordered
+    description: Test my datediff calculation for days_since_ordered
+    model: customer_orders
+    overrides:
+      macros:
+        dbt_current_timestamp: "cast('2025-12-05 00:00:00' as timestamp)"
+
+    given:
+      - input: source('jaffle_shop', 'orders')
+        rows:
+          - {id: 1, user_id: 1, status: 'completed', order_date: '2024-01-01'}
+      - input: source('jaffle_shop', 'customers')
+        rows:
+          - {id: 1, first_name: 'Alice', last_name: 'Smith'}
+      - input: source('stripe', 'payment')
+        rows:
+          - {orderid: 1, amount: 1000, status: 'success'}
+    expect:
+      rows:
+        - {order_id: 1, days_since_ordered: 704}
+
+
+#dbt test --select test_type:unit
+#dbt test --select test_days_since_ordered
