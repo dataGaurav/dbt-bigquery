@@ -8,7 +8,8 @@ select
     total_lifetime_value,
     round(amount/100.0,2) as order_value_dollars,
     orders.status as order_status,
-    payments.status as payment_status
+    payments.status as payment_status,
+    date_diff(cast({{ dbt.current_timestamp() }} as date), cast(orders.order_date as date), day) as days_since_ordered
 from {{ source('jaffle_shop', 'orders') }} as orders
 
 join (
