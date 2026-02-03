@@ -31,3 +31,50 @@ models:
               arguments:
                 field: customer_id
                 to: ref('stg_jaffle_shop__customers')
+
+  - name: stg_stripe__payments_legacy
+    latest_version: 2
+    columns:
+      - name: payment_id
+        data_type: int
+      - name: order_id
+        data_type: int
+      - name: payment_status
+        data_type: string
+      - name: payment_amount
+        data_type: float64
+      - name: payment_method
+        data_type: string
+      - name: created_at
+        data_type: timestamp
+    versions:
+      - v: 1
+        defined_in: stg_stripe__payments_legacy_v1
+        config:
+          alias: stg_stripe__payments_legacy_v1
+        columns:
+          - name: payment_id
+            data_type: int
+          - name: order_id
+            data_type: int
+          - name: payment_status
+            data_type: string
+          - name: payment_amount
+            data_type: float64
+      - v: 2
+        defined_in: stg_stripe__payments_legacy_v2
+        config:
+          alias: stg_stripe__payments_legacy
+        columns:
+          - name: payment_id
+            data_type: int
+          - name: order_id
+            data_type: int
+          - name: payment_status
+            data_type: string
+          - name: payment_amount
+            data_type: float64
+          - name: payment_method
+            data_type: string
+          - name: created_at
+            data_type: timestamp

@@ -6,3 +6,5 @@
 
 -- Example: Reference an existing model instead
 select * from {{ ref('dim_customers') }} limit 10
+
+--select * from {{ ref('stg_stripe__payments_legacy', v=2) }}
