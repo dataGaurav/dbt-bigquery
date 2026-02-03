@@ -10,7 +10,6 @@ seeds:
           - not_null
           - unique  
     config:
-      # grants:
-      #   select:
-      #     - roles/bigquery.dataViewer 
+      grants:
+        roles/bigquery.dataViewer: ['user:gauravpoojary252000@gmail.com']
       #     - roles/bigquery.jobUser    
