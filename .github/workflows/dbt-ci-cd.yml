@@ -1,10 +1,11 @@
 # dbt CI/CD Pipeline
 #
+# Production branch: main. Merging a PR into main triggers a push to main → CD job runs automatically.
+#
 # High-Level Workflow:
-#   Trigger:   PR created/updated targeting the Production branch
-#   CI Phase:  dbt compile, dbt seed, dbt run, dbt test against staging/temp (dev project, staging dataset only)
-#   Review:    Manual review and approval by authorized leads (enforce via branch protection)
-#   CD Phase:  On merge, Service Account runs dbt run + dbt test in the PROD BigQuery project
+#   PR targeting main → CI runs (compile, seed, run, test in staging). After review, merge to main.
+#   Merge to main    → Push event to main → CD job runs automatically (dbt run + dbt test in PROD).
+#   workflow_dispatch → Run CD manually from Actions tab if needed.
 #
 # Required secrets:
 #   GCP_SA_KEY_DEV  - Service account JSON for the DEV BigQuery project (CI uses this for staging/temp; same project, different dataset)
@@ -16,9 +17,10 @@ name: dbt CI/CD
 
 on:
   pull_request:
-    branches: [main, production]
+    branches: [main]   # PR targeting main → CI runs
   push:
-    branches: [main, production]
+    branches: [main]   # Merge to main → push event → CD runs automatically
+  workflow_dispatch:   # Run CD manually from Actions tab if needed
 
 env:
   # Use repo's profiles.yml (dev, staging, prod); workflow sets DBT_TARGET and env vars
@@ -87,11 +89,11 @@ jobs:
         if: always()
         run: rm -f "${{ github.workspace }}/sa-dev.json" "${{ github.workspace }}/sa-prod.json" 2>/dev/null || true
 
-  # --- CD Phase: deploy on merge to PROD BigQuery project ---
+  # --- CD Phase: runs automatically when a PR is merged into main (push to main), or manually ---
   cd:
     name: CD (run & test in prod)
     runs-on: ubuntu-latest
-    if: github.event_name == 'push' && (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/production')
+    if: (github.event_name == 'push' && github.ref == 'refs/heads/main') || github.event_name == 'workflow_dispatch'
     steps:
       - name: Checkout
         uses: actions/checkout@v4
