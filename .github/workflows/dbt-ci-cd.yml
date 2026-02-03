@@ -10,7 +10,7 @@
 #   GCP_SA_KEY_DEV  - Service account JSON for the DEV BigQuery project (CI uses this for staging/temp; same project, different dataset)
 #   GCP_SA_KEY_PROD - Service account JSON for the PROD BigQuery project (CD)
 #
-# Required variables: DBT_BQ_PROJECT_DEV, DBT_BQ_PROJECT_PROD. Optional: DBT_BQ_DATASET_STAGING (default: dbt_staging)
+# Required variables: DBT_BQ_PROJECT_DEV, DBT_BQ_PROJECT_PROD. Optional: DBT_BQ_DATASET_STAGING (default: dbt_gpoojary_staging)
 
 name: dbt CI/CD
 
@@ -57,7 +57,7 @@ jobs:
           DBT_TARGET: staging
           DBT_KEYFILE_DEV: ${{ github.workspace }}/sa-dev.json
           DBT_BQ_PROJECT_DEV: ${{ vars.DBT_BQ_PROJECT_DEV }}
-          DBT_BQ_DATASET_STAGING: ${{ vars.DBT_BQ_DATASET_STAGING || '_staging' }}
+          DBT_BQ_DATASET_STAGING: ${{ vars.DBT_BQ_DATASET_STAGING || 'dbt_gpoojary_staging' }}
 
       - name: dbt test
         run: dbt test
@@ -65,7 +65,7 @@ jobs:
           DBT_TARGET: staging
           DBT_KEYFILE_DEV: ${{ github.workspace }}/sa-dev.json
           DBT_BQ_PROJECT_DEV: ${{ vars.DBT_BQ_PROJECT_DEV }}
-          DBT_BQ_DATASET_STAGING: ${{ vars.DBT_BQ_DATASET_STAGING || '_staging' }}
+          DBT_BQ_DATASET_STAGING: ${{ vars.DBT_BQ_DATASET_STAGING || 'dbt_gpoojary_staging' }}
 
       - name: Remove credentials
         if: always()
