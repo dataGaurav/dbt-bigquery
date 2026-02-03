@@ -57,7 +57,7 @@ jobs:
           DBT_TARGET: staging
           DBT_KEYFILE_DEV: ${{ github.workspace }}/sa-dev.json
           DBT_BQ_PROJECT_DEV: ${{ vars.DBT_BQ_PROJECT_DEV }}
-          DBT_BQ_DATASET_STAGING: ${{ vars.DBT_BQ_DATASET_STAGING || 'dbt_gpoojary_staging' }}
+          DBT_BQ_DATASET_STAGING: ${{ vars.DBT_BQ_DATASET_STAGING || '_staging' }}
 
       - name: dbt test
         run: dbt test
@@ -65,7 +65,7 @@ jobs:
           DBT_TARGET: staging
           DBT_KEYFILE_DEV: ${{ github.workspace }}/sa-dev.json
           DBT_BQ_PROJECT_DEV: ${{ vars.DBT_BQ_PROJECT_DEV }}
-          DBT_BQ_DATASET_STAGING: ${{ vars.DBT_BQ_DATASET_STAGING || 'dbt_gpoojary_staging' }}
+          DBT_BQ_DATASET_STAGING: ${{ vars.DBT_BQ_DATASET_STAGING || '_staging' }}
 
       - name: Remove credentials
         if: always()
@@ -103,7 +103,7 @@ jobs:
           DBT_TARGET: prod
           DBT_KEYFILE_PROD: ${{ github.workspace }}/sa-prod.json
           DBT_BQ_PROJECT_PROD: ${{ vars.DBT_BQ_PROJECT_PROD }}
-          DBT_BQ_DATASET_PROD: ${{ vars.DBT_BQ_DATASET_PROD || 'dbt_prod' }}
+          DBT_BQ_DATASET_PROD: ${{ vars.DBT_BQ_DATASET_PROD || '' }}
 
       - name: dbt test
         run: dbt test
@@ -111,7 +111,7 @@ jobs:
           DBT_TARGET: prod
           DBT_KEYFILE_PROD: ${{ github.workspace }}/sa-prod.json
           DBT_BQ_PROJECT_PROD: ${{ vars.DBT_BQ_PROJECT_PROD }}
-          DBT_BQ_DATASET_PROD: ${{ vars.DBT_BQ_DATASET_PROD || 'dbt_prod' }}
+          DBT_BQ_DATASET_PROD: ${{ vars.DBT_BQ_DATASET_PROD || '' }}
 
       - name: Remove credentials
         if: always()
