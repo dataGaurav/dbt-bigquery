@@ -1,14 +1,9 @@
-# owner supports name, email. Use meta for slack/github etc.
+# groups: name + owner (name, email only). Custom contact (slack/github) not supported in schema.
 groups:
   - name: finance
     owner:
       name: Firstname, Lastname
       email: firstname.lastname@example.com
-    meta:
-      slack: finance-data
-      github: finance-data-team
   - name: product
     owner:
       email: product@jaffleshop.com
-    meta:
-      github: product-data-team
