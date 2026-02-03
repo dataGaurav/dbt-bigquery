@@ -43,6 +43,9 @@ jobs:
       - name: Install dbt-bigquery
         run: pip install dbt-bigquery
 
+      - name: Install package dependencies
+        run: dbt deps
+
       - name: Write dev credentials (staging uses dev project, staging dataset only)
         run: echo '${{ secrets.GCP_SA_KEY_DEV }}' > "${{ github.workspace }}/sa-dev.json"
         env:
@@ -84,6 +87,9 @@ jobs:
 
       - name: Install dbt-bigquery
         run: pip install dbt-bigquery
+
+      - name: Install package dependencies
+        run: dbt deps
 
       - name: Write prod credentials
         run: echo '${{ secrets.GCP_SA_KEY_PROD }}' > "${{ github.workspace }}/sa-prod.json"
