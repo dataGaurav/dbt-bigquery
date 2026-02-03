@@ -29,5 +29,6 @@ metrics:
         name: amount
         filter: |
           {{ Dimension('sem_fct_orders__order_date') }} >= '2020-01-01'
-    meta:
-      owner: '@analytics'
+    config:
+      meta:
+        owner: '@analytics'
