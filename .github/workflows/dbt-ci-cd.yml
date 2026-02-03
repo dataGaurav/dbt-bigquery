@@ -96,6 +96,7 @@ jobs:
         env:
           GCP_SA_KEY_PROD: ${{ secrets.GCP_SA_KEY_PROD }}
 
+      # Optional: add --vars '{"run_legacy_audit": true}' to run the legacy audit model (compare_relations) in prod
       - name: dbt run
         run: dbt run
         env:
