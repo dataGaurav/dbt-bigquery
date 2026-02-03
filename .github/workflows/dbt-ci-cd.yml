@@ -2,7 +2,7 @@
 #
 # High-Level Workflow:
 #   Trigger:   PR created/updated targeting the Production branch
-#   CI Phase:  dbt compile + dbt test against staging/temp (dev project, staging dataset only)
+#   CI Phase:  dbt compile, dbt seed, dbt run, dbt test against staging/temp (dev project, staging dataset only)
 #   Review:    Manual review and approval by authorized leads (enforce via branch protection)
 #   CD Phase:  On merge, Service Account runs dbt run + dbt test in the PROD BigQuery project
 #
@@ -53,6 +53,22 @@ jobs:
 
       - name: dbt compile
         run: dbt compile
+        env:
+          DBT_TARGET: staging
+          DBT_KEYFILE_DEV: ${{ github.workspace }}/sa-dev.json
+          DBT_BQ_PROJECT_DEV: ${{ vars.DBT_BQ_PROJECT_DEV }}
+          DBT_BQ_DATASET_STAGING: ${{ vars.DBT_BQ_DATASET_STAGING || 'dbt_gpoojary_staging' }}
+
+      - name: dbt seed
+        run: dbt seed
+        env:
+          DBT_TARGET: staging
+          DBT_KEYFILE_DEV: ${{ github.workspace }}/sa-dev.json
+          DBT_BQ_PROJECT_DEV: ${{ vars.DBT_BQ_PROJECT_DEV }}
+          DBT_BQ_DATASET_STAGING: ${{ vars.DBT_BQ_DATASET_STAGING || 'dbt_gpoojary_staging' }}
+
+      - name: dbt run
+        run: dbt run
         env:
           DBT_TARGET: staging
           DBT_KEYFILE_DEV: ${{ github.workspace }}/sa-dev.json
