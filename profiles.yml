@@ -1,0 +1,30 @@
+# Default target: dev. CI uses staging (staging/temp); CD uses prod.
+# Project/dataset/keyfile use env_var so CI/CD can inject; defaults support local dev.
+default:
+  target: dev
+  outputs:
+    dev:
+      type: bigquery
+      threads: 4
+      method: service-account
+      keyfile: "{{ env_var('DBT_KEYFILE_DEV', '/Users/gaurav/Downloads/Service-Account/data-platforms-team-sandbox-dbt.json') }}"
+      project: "{{ env_var('DBT_BQ_PROJECT_DEV', 'data-platforms-team-sandbox') }}"
+      dataset: "{{ env_var('DBT_BQ_DATASET_DEV', 'dbt_gpoojary') }}"
+      location: US
+    # Staging/temp — same project as dev, different dataset only. Used by CI for dbt compile + dbt test.
+    staging:
+      type: bigquery
+      threads: 4
+      method: service-account
+      keyfile: "{{ env_var('DBT_KEYFILE_DEV', '/Users/gaurav/Downloads/Service-Account/data-platforms-team-sandbox-dbt.json') }}"
+      project: "{{ env_var('DBT_BQ_PROJECT_DEV', 'data-platforms-team-sandbox') }}"
+      dataset: "{{ env_var('DBT_BQ_DATASET_STAGING', 'dbt_gpoojary_staging') }}"
+      location: US
+    prod:
+      type: bigquery
+      threads: 4
+      method: service-account
+      keyfile: "{{ env_var('DBT_KEYFILE_PROD', '/Users/gaurav/Downloads/Service-Account/data-platforms-team-sandbox-84c16172b233.json') }}"
+      project: "{{ env_var('DBT_BQ_PROJECT_PROD') }}"
+      dataset: "{{ env_var('DBT_BQ_DATASET_PROD', 'dbt_prod') }}"
+      location: US

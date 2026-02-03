@@ -38,13 +38,11 @@ sources:
 
       - name: support_tickets
         description: Support tickets submitted by users, including metadata on issue type,
-          priority, and submission channel. Updates hourly. 
+          priority, and submission channel. Updates hourly.
         config:
           freshness:
             warn_after: {count: 1, period: hour}
-          loaded_at_field: created_at  # Commented out: created_at may be DATE type, but freshness requires TIMESTAMP
-          # Remove freshness check or use a timestamp column if available
-
+          loaded_at_field: created_at
         columns:
           - name: ticket_id
             description: Unique identifier for the ticket
@@ -77,10 +75,6 @@ sources:
               - not_null
       - name: transactions
         description: Completed user transactions including payment and device metadata. Updates hourly.
-        config:
-          # freshness:
-          #   warn_after: {count: 1, period: hour}
-          # loaded_at_field: completed_at
         columns:
           - name: transaction_id
             description: Unique identifier for the transaction

@@ -1,0 +1,134 @@
+# dbt CI/CD Pipeline
+#
+# High-Level Workflow:
+#   Trigger:   PR created/updated targeting the Production branch
+#   CI Phase:  dbt compile, dbt seed, dbt run, dbt test against staging/temp (dev project, staging dataset only)
+#   Review:    Manual review and approval by authorized leads (enforce via branch protection)
+#   CD Phase:  On merge, Service Account runs dbt run + dbt test in the PROD BigQuery project
+#
+# Required secrets:
+#   GCP_SA_KEY_DEV  - Service account JSON for the DEV BigQuery project (CI uses this for staging/temp; same project, different dataset)
+#   GCP_SA_KEY_PROD - Service account JSON for the PROD BigQuery project (CD)
+#
+# Required variables: DBT_BQ_PROJECT_DEV, DBT_BQ_PROJECT_PROD. Optional: DBT_BQ_DATASET_STAGING (default: dbt_gpoojary_staging). Python models are excluded from deploy.
+
+name: dbt CI/CD
+
+on:
+  pull_request:
+    branches: [main, production]
+  push:
+    branches: [main, production]
+
+env:
+  # Use repo's profiles.yml (dev, staging, prod); workflow sets DBT_TARGET and env vars
+  DBT_PROFILES_DIR: ${{ github.workspace }}
+  PYTHON_VERSION: "3.11"
+
+jobs:
+  # --- CI Phase: dbt compile + dbt test against staging/temp environment ---
+  ci:
+    name: CI (compile & test)
+    runs-on: ubuntu-latest
+    if: github.event_name == 'pull_request'
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+
+      - name: Install dbt-bigquery
+        run: pip install dbt-bigquery
+
+      - name: Install package dependencies
+        run: dbt deps
+
+      - name: Write dev credentials (staging uses dev project, staging dataset only)
+        run: echo '${{ secrets.GCP_SA_KEY_DEV }}' > "${{ github.workspace }}/sa-dev.json"
+        env:
+          GCP_SA_KEY_DEV: ${{ secrets.GCP_SA_KEY_DEV }}
+
+      - name: dbt compile
+        run: dbt compile
+        env:
+          DBT_TARGET: staging
+          DBT_KEYFILE_DEV: ${{ github.workspace }}/sa-dev.json
+          DBT_BQ_PROJECT_DEV: ${{ vars.DBT_BQ_PROJECT_DEV }}
+          DBT_BQ_DATASET_STAGING: ${{ vars.DBT_BQ_DATASET_STAGING || 'dbt_gpoojary_staging' }}
+
+      - name: dbt seed
+        run: dbt seed
+        env:
+          DBT_TARGET: staging
+          DBT_KEYFILE_DEV: ${{ github.workspace }}/sa-dev.json
+          DBT_BQ_PROJECT_DEV: ${{ vars.DBT_BQ_PROJECT_DEV }}
+          DBT_BQ_DATASET_STAGING: ${{ vars.DBT_BQ_DATASET_STAGING || 'dbt_gpoojary_staging' }}
+
+      - name: dbt run
+        run: dbt run --exclude is_holiday_2025
+        env:
+          DBT_TARGET: staging
+          DBT_KEYFILE_DEV: ${{ github.workspace }}/sa-dev.json
+          DBT_BQ_PROJECT_DEV: ${{ vars.DBT_BQ_PROJECT_DEV }}
+          DBT_BQ_DATASET_STAGING: ${{ vars.DBT_BQ_DATASET_STAGING || 'dbt_gpoojary_staging' }}
+
+      - name: dbt test
+        run: dbt test
+        env:
+          DBT_TARGET: staging
+          DBT_KEYFILE_DEV: ${{ github.workspace }}/sa-dev.json
+          DBT_BQ_PROJECT_DEV: ${{ vars.DBT_BQ_PROJECT_DEV }}
+          DBT_BQ_DATASET_STAGING: ${{ vars.DBT_BQ_DATASET_STAGING || 'dbt_gpoojary_staging' }}
+
+      - name: Remove credentials
+        if: always()
+        run: rm -f "${{ github.workspace }}/sa-dev.json" "${{ github.workspace }}/sa-prod.json" 2>/dev/null || true
+
+  # --- CD Phase: deploy on merge to PROD BigQuery project ---
+  cd:
+    name: CD (run & test in prod)
+    runs-on: ubuntu-latest
+    if: github.event_name == 'push' && (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/production')
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+
+      - name: Install dbt-bigquery
+        run: pip install dbt-bigquery
+
+      - name: Install package dependencies
+        run: dbt deps
+
+      - name: Write prod credentials
+        run: echo '${{ secrets.GCP_SA_KEY_PROD }}' > "${{ github.workspace }}/sa-prod.json"
+        env:
+          GCP_SA_KEY_PROD: ${{ secrets.GCP_SA_KEY_PROD }}
+
+      # Optional: add --vars '{"run_legacy_audit": true}' to run the legacy audit model (compare_relations) in prod
+      - name: dbt run
+        run: dbt run --exclude is_holiday_2025
+        env:
+          DBT_TARGET: prod
+          DBT_KEYFILE_PROD: ${{ github.workspace }}/sa-prod.json
+          DBT_BQ_PROJECT_PROD: ${{ vars.DBT_BQ_PROJECT_PROD }}
+          DBT_BQ_DATASET_PROD: ${{ vars.DBT_BQ_DATASET_PROD || 'dbt_prod' }}
+
+      - name: dbt test
+        run: dbt test
+        env:
+          DBT_TARGET: prod
+          DBT_KEYFILE_PROD: ${{ github.workspace }}/sa-prod.json
+          DBT_BQ_PROJECT_PROD: ${{ vars.DBT_BQ_PROJECT_PROD }}
+          DBT_BQ_DATASET_PROD: ${{ vars.DBT_BQ_DATASET_PROD || 'dbt_prod' }}
+
+      - name: Remove credentials
+        if: always()
+        run: rm -f "${{ github.workspace }}/sa-dev.json" "${{ github.workspace }}/sa-prod.json" 2>/dev/null || true

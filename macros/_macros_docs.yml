@@ -8,7 +8,6 @@ macros:
       - name: decimals
         type: integer
         description: The number of decimal places to round to (default is 2).
-        default: 2
     returns:
       type: string
       description: A SQL expression that converts the specified column from cents to dollars, rounded to the specified number of decimal places.
