@@ -18,7 +18,7 @@ default:
       method: service-account
       keyfile: "{{ env_var('DBT_KEYFILE_DEV', '/Users/gaurav/Downloads/Service-Account/data-platforms-team-sandbox-dbt.json') }}"
       project: "{{ env_var('DBT_BQ_PROJECT_DEV', 'data-platforms-team-sandbox') }}"
-      dataset: "{{ env_var('DBT_BQ_DATASET_STAGING', 'dbt_gpoojary_test') }}"
+      dataset: "{{ env_var('DBT_BQ_DATASET_STAGING', 'dbt_gpoojary_staging') }}"
       location: US
     prod:
       type: bigquery

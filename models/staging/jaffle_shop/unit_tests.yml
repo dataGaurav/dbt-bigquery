@@ -36,7 +36,7 @@ unit_tests:
     model: customer_orders
     overrides:
       macros:
-        dbt_current_timestamp: "cast('2025-12-05 00:00:00' as timestamp)"
+        dbt_current_timestamp: "cast('2026-02-03 00:00:00' as timestamp)"
 
     given:
       - input: source('jaffle_shop', 'orders')
@@ -50,7 +50,7 @@ unit_tests:
           - {orderid: 1, amount: 1000, status: 'success'}
     expect:
       rows:
-        - {order_id: 1, days_since_ordered: 704}
+        - {order_id: 1, days_since_ordered: 764}
 
 
 #dbt test --select test_type:unit
