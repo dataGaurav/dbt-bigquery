@@ -32,11 +32,11 @@ unit_tests:
         - {order_id: 86, order_status: 'placed'} 
   
   - name: test_days_since_ordered
-    description: Test my datediff calculation for days_since_ordered
+    description: Test my datediff calculation for days_since_ordered (uses var for deterministic as-of date)
     model: customer_orders
     overrides:
-      macros:
-        dbt_current_timestamp: "cast('2026-02-09 00:00:00' as timestamp)"
+      vars:
+        days_since_ordered_as_of_date: "date('2025-12-05')"
 
     given:
       - input: source('jaffle_shop', 'orders')
@@ -50,7 +50,7 @@ unit_tests:
           - {orderid: 1, amount: 1000, status: 'success'}
     expect:
       rows:
-        - {order_id: 1, days_since_ordered: 764}
+        - {order_id: 1, days_since_ordered: 704}
 
 
 #dbt test --select test_type:unit

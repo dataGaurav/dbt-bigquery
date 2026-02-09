@@ -9,7 +9,7 @@ select
     round(amount/100.0,2) as order_value_dollars,
     orders.status as order_status,
     payments.status as payment_status,
-    date_diff(cast({{ dbt.current_timestamp() }} as date), cast(orders.order_date as date), day) as days_since_ordered
+    date_diff(cast({% if var('days_since_ordered_as_of_date', none) is not none %}{{ var('days_since_ordered_as_of_date') }}{% else %}{{ dbt.current_timestamp() }}{% endif %} as date), cast(orders.order_date as date), day) as days_since_ordered
 from {{ source('jaffle_shop', 'orders') }} as orders
 
 join (
