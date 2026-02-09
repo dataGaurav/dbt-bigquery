@@ -8,7 +8,8 @@
 #   workflow_dispatch → Run CD manually from Actions tab if needed.
 #
 # Gate (PR): A deliberate dbt test failure in a PR fails CI → with branch protection, merge is blocked → no deploy.
-# Gate (CD): CD runs dbt test first; only if tests pass does it run dbt run. No deploy if tests fail.
+# Gate: The gate that prevents deploy when tests fail is at merge time (CI). Require "CI (compile & test)" before merge.
+# CD: dbt run first (create/update models), then dbt test. Tests need objects to exist; if we ran test first, test would fail when prod is empty or on first deploy.
 # Required: Settings → Branches (main) → Require status check "CI (compile & test)" to pass before merge.
 #
 # Required secrets:
@@ -93,9 +94,9 @@ jobs:
         if: always()
         run: rm -f "${{ github.workspace }}/sa-dev.json" "${{ github.workspace }}/sa-prod.json" 2>/dev/null || true
 
-  # --- CD Phase: gate = run tests first; only deploy (dbt run) if tests pass ---
+  # --- CD Phase: dbt run first (models must exist for tests), then dbt test. Gate = CI must pass before merge. ---
   cd:
-    name: CD (test then run in prod)
+    name: CD (run & test in prod)
     runs-on: ubuntu-latest
     if: (github.event_name == 'push' && github.ref == 'refs/heads/main') || github.event_name == 'workflow_dispatch'
     steps:
@@ -118,19 +119,26 @@ jobs:
         env:
           GCP_SA_KEY_PROD: ${{ secrets.GCP_SA_KEY_PROD }}
 
-      # Gate: run tests first; if any fail, job fails and dbt run is never executed
-      - name: dbt test (gate)
-        run: dbt test
+      - name: dbt seed
+        run: dbt seed
         env:
           DBT_TARGET: prod
           DBT_KEYFILE_PROD: ${{ github.workspace }}/sa-prod.json
           DBT_BQ_PROJECT_PROD: ${{ vars.DBT_BQ_PROJECT_PROD }}
           DBT_BQ_DATASET_PROD: ${{ vars.DBT_BQ_DATASET_PROD || 'dbt_prod' }}
 
-      # Deploy only if tests passed (step above succeeded)
+      # Run so models/tables exist; otherwise dbt test would fail (no objects in prod on first deploy or empty state)
       # Optional: add --vars '{"run_legacy_audit": true}' to run the legacy audit model in prod
-      - name: dbt run (deploy)
+      - name: dbt run
         run: dbt run --exclude is_holiday_2025
+        env:
+          DBT_TARGET: prod
+          DBT_KEYFILE_PROD: ${{ github.workspace }}/sa-prod.json
+          DBT_BQ_PROJECT_PROD: ${{ vars.DBT_BQ_PROJECT_PROD }}
+          DBT_BQ_DATASET_PROD: ${{ vars.DBT_BQ_DATASET_PROD || 'dbt_prod' }}
+
+      - name: dbt test
+        run: dbt test
         env:
           DBT_TARGET: prod
           DBT_KEYFILE_PROD: ${{ github.workspace }}/sa-prod.json
