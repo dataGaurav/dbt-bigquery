@@ -17,7 +17,7 @@ default:
       type: bigquery
       threads: 4
       method: service-account
-      #keyfile: "{{ env_var('DBT_KEYFILE_DEV') }}"
+      keyfile: "{{ env_var('DBT_KEYFILE_DEV') }}"
       project: "{{ env_var('DBT_BQ_PROJECT_DEV') }}"
       dataset: "{{ env_var('DBT_BQ_DATASET_STAGING') }}"
       location: US
@@ -27,7 +27,7 @@ default:
       type: bigquery
       threads: 4
       method: service-account
-      #keyfile: "{{ env_var('DBT_KEYFILE_PROD') }}"
+      keyfile: "{{ env_var('DBT_KEYFILE_PROD') }}"
       project: "{{ env_var('DBT_BQ_PROJECT_PROD') }}"
       dataset: "{{ env_var('DBT_BQ_DATASET_PROD') }}"
       location: US
