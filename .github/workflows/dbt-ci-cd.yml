@@ -61,7 +61,7 @@ jobs:
       - name: dbt compile
         run: dbt compile
         env:
-          DBT_TARGET: staging
+          DBT_TARGET: dev
           DBT_KEYFILE_DEV: ${{ github.workspace }}/sa-dev.json
           DBT_BQ_PROJECT_DEV: ${{ vars.DBT_BQ_PROJECT_DEV }}
           DBT_BQ_DATASET_STAGING: ${{ vars.DBT_BQ_DATASET_STAGING }}
@@ -69,7 +69,7 @@ jobs:
       - name: dbt seed
         run: dbt seed
         env:
-          DBT_TARGET: staging
+          DBT_TARGET: dev
           DBT_KEYFILE_DEV: ${{ github.workspace }}/sa-dev.json
           DBT_BQ_PROJECT_DEV: ${{ vars.DBT_BQ_PROJECT_DEV }}
           DBT_BQ_DATASET_STAGING: ${{ vars.DBT_BQ_DATASET_STAGING }}
@@ -77,7 +77,7 @@ jobs:
       - name: dbt run
         run: dbt run --exclude is_holiday_2025
         env:
-          DBT_TARGET: staging
+          DBT_TARGET: dev
           DBT_KEYFILE_DEV: ${{ github.workspace }}/sa-dev.json
           DBT_BQ_PROJECT_DEV: ${{ vars.DBT_BQ_PROJECT_DEV }}
           DBT_BQ_DATASET_STAGING: ${{ vars.DBT_BQ_DATASET_STAGING }}
@@ -85,7 +85,7 @@ jobs:
       - name: dbt test
         run: dbt test
         env:
-          DBT_TARGET: staging
+          DBT_TARGET: dev
           DBT_KEYFILE_DEV: ${{ github.workspace }}/sa-dev.json
           DBT_BQ_PROJECT_DEV: ${{ vars.DBT_BQ_PROJECT_DEV }}
           DBT_BQ_DATASET_STAGING: ${{ vars.DBT_BQ_DATASET_STAGING }}
