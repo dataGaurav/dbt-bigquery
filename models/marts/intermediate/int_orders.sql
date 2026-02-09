@@ -11,6 +11,7 @@ payments as (
 ),
 
 
+
 order_total as (
 
     select 
