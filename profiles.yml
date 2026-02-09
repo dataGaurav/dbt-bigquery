@@ -19,7 +19,7 @@ default:
       method: service-account
       keyfile: "{{ env_var('DBT_KEYFILE_DEV') }}"
       project: "{{ env_var('DBT_BQ_PROJECT_DEV') }}"
-      dataset: "{{ env_var('DBT_BQ_DATASET_DEV') }}"
+      dataset: "{{ env_var('DBT_BQ_DATASET_STAGING', 'dbt_gpoojary_staging') }}"
       location: US
 
     # Prod: service-account (for CD)
