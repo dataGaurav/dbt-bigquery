@@ -41,13 +41,15 @@ Set your BigQuery project IDs (and optionally datasets) under **Settings → Sec
 
 Create one service account per project in GCP (IAM → Service accounts → Keys), then add each key’s full JSON as a repository secret.
 
-### 3. Branch protection (review phase)
+### 3. Branch protection (merge gate)
 
-On `main` and/or `production`:
+On `main`:
 
 - **Require a pull request** before merging.
 - **Require approvals** (e.g. 1) from your authorized leads.
-- Optionally **require status checks** and select the “CI (compile & test)” workflow so merge is blocked until CI passes.
+- **Require status checks** and select the “CI (compile & test)” workflow so merge is blocked until CI passes.
+
+**Effect:** A deliberate dbt test failure in a PR causes CI to fail → the status check fails → merge is blocked → code cannot be merged or deployed. CD only runs after a merge to main, so failing tests in the PR successfully prevent deployment.
 
 ## Local development
 
