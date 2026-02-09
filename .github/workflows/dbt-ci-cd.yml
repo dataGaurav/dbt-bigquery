@@ -64,7 +64,7 @@ jobs:
           DBT_TARGET: staging
           DBT_KEYFILE_DEV: ${{ github.workspace }}/sa-dev.json
           DBT_BQ_PROJECT_DEV: ${{ vars.DBT_BQ_PROJECT_DEV }}
-          DBT_BQ_DATASET_STAGING: ${{ vars.DBT_BQ_DATASET_STAGING || 'dbt_gpoojary_staging' }}
+          DBT_BQ_DATASET_STAGING: ${{ vars.DBT_BQ_DATASET_STAGING }}
 
       - name: dbt seed
         run: dbt seed
@@ -72,7 +72,7 @@ jobs:
           DBT_TARGET: staging
           DBT_KEYFILE_DEV: ${{ github.workspace }}/sa-dev.json
           DBT_BQ_PROJECT_DEV: ${{ vars.DBT_BQ_PROJECT_DEV }}
-          DBT_BQ_DATASET_STAGING: ${{ vars.DBT_BQ_DATASET_STAGING || 'dbt_gpoojary_staging' }}
+          DBT_BQ_DATASET_STAGING: ${{ vars.DBT_BQ_DATASET_STAGING }}
 
       - name: dbt run
         run: dbt run --exclude is_holiday_2025
@@ -80,7 +80,7 @@ jobs:
           DBT_TARGET: staging
           DBT_KEYFILE_DEV: ${{ github.workspace }}/sa-dev.json
           DBT_BQ_PROJECT_DEV: ${{ vars.DBT_BQ_PROJECT_DEV }}
-          DBT_BQ_DATASET_STAGING: ${{ vars.DBT_BQ_DATASET_STAGING || 'dbt_gpoojary_staging' }}
+          DBT_BQ_DATASET_STAGING: ${{ vars.DBT_BQ_DATASET_STAGING }}
 
       - name: dbt test
         run: dbt test
@@ -88,7 +88,7 @@ jobs:
           DBT_TARGET: staging
           DBT_KEYFILE_DEV: ${{ github.workspace }}/sa-dev.json
           DBT_BQ_PROJECT_DEV: ${{ vars.DBT_BQ_PROJECT_DEV }}
-          DBT_BQ_DATASET_STAGING: ${{ vars.DBT_BQ_DATASET_STAGING || 'dbt_gpoojary_staging' }}
+          DBT_BQ_DATASET_STAGING: ${{ vars.DBT_BQ_DATASET_STAGING }}
 
       - name: Remove credentials
         if: always()
