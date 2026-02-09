@@ -1,5 +1,6 @@
 # Default target: dev. CI uses staging (staging/temp); CD uses prod.
 # Project/dataset/keyfile use env_var so CI/CD can inject; defaults support local dev.
+# Python models (e.g. is_holiday_2025) need compute_region and gcs_bucket — set DBT_GCS_BUCKET for local runs.
 default:
   target: dev
   outputs:
@@ -11,6 +12,8 @@ default:
       project: "{{ env_var('DBT_BQ_PROJECT_DEV', 'data-platforms-team-sandbox') }}"
       dataset: "{{ env_var('DBT_BQ_DATASET_DEV', 'dbt_gpoojary') }}"
       location: US
+      # compute_region: "{{ env_var('DBT_COMPUTE_REGION', 'US') }}"
+      # gcs_bucket: "{{ env_var('DBT_GCS_BUCKET', 'data-platforms-team-sandbox-dbt-python') }}"
     # Staging/temp — same project as dev, different dataset only. Used by CI for dbt compile + dbt test.
     staging:
       type: bigquery
@@ -20,6 +23,8 @@ default:
       project: "{{ env_var('DBT_BQ_PROJECT_DEV', 'data-platforms-team-sandbox') }}"
       dataset: "{{ env_var('DBT_BQ_DATASET_STAGING', 'dbt_gpoojary_staging') }}"
       location: US
+      # compute_region: "{{ env_var('DBT_COMPUTE_REGION', 'US') }}"
+      # gcs_bucket: "{{ env_var('DBT_GCS_BUCKET', 'data-platforms-team-sandbox-dbt-python') }}"
     prod:
       type: bigquery
       threads: 4
@@ -28,3 +33,5 @@ default:
       project: "{{ env_var('DBT_BQ_PROJECT_PROD') }}"
       dataset: "{{ env_var('DBT_BQ_DATASET_PROD', 'dbt_prod') }}"
       location: US
+      # compute_region: "{{ env_var('DBT_COMPUTE_REGION', 'US') }}"
+      # gcs_bucket: "{{ env_var('DBT_GCS_BUCKET', 'data-platforms-team-sandbox-dbt-python') }}"
