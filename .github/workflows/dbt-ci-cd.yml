@@ -53,46 +53,46 @@ jobs:
       - name: Install package dependencies
         run: dbt deps
 
-      - name: Write dev credentials (staging uses dev project, staging dataset only)
-        run: echo '${{ secrets.GCP_SA_KEY_DEV }}' > "${{ github.workspace }}/sa-dev.json"
+      - name: Write staging credentials
+        run: echo '${{ secrets.GCP_SA_KEY_DEV }}' > "${{ github.workspace }}/sa-staging.json"
         env:
           GCP_SA_KEY_DEV: ${{ secrets.GCP_SA_KEY_DEV }}
 
       - name: dbt compile
         run: dbt compile
         env:
-          DBT_TARGET: dev
-          DBT_KEYFILE_DEV: ${{ github.workspace }}/sa-dev.json
+          DBT_TARGET: staging
+          DBT_KEYFILE_DEV: ${{ github.workspace }}/sa-staging.json
           DBT_BQ_PROJECT_DEV: ${{ vars.DBT_BQ_PROJECT_DEV }}
           DBT_BQ_DATASET_STAGING: ${{ vars.DBT_BQ_DATASET_STAGING }}
 
       - name: dbt seed
         run: dbt seed
         env:
-          DBT_TARGET: dev
-          DBT_KEYFILE_DEV: ${{ github.workspace }}/sa-dev.json
+          DBT_TARGET: staging
+          DBT_KEYFILE_DEV: ${{ github.workspace }}/sa-staging.json
           DBT_BQ_PROJECT_DEV: ${{ vars.DBT_BQ_PROJECT_DEV }}
           DBT_BQ_DATASET_STAGING: ${{ vars.DBT_BQ_DATASET_STAGING }}
 
       - name: dbt run
         run: dbt run --exclude is_holiday_2025
         env:
-          DBT_TARGET: dev
-          DBT_KEYFILE_DEV: ${{ github.workspace }}/sa-dev.json
+          DBT_TARGET: staging
+          DBT_KEYFILE_DEV: ${{ github.workspace }}/sa-staging.json
           DBT_BQ_PROJECT_DEV: ${{ vars.DBT_BQ_PROJECT_DEV }}
           DBT_BQ_DATASET_STAGING: ${{ vars.DBT_BQ_DATASET_STAGING }}
 
       - name: dbt test
         run: dbt test
         env:
-          DBT_TARGET: dev
-          DBT_KEYFILE_DEV: ${{ github.workspace }}/sa-dev.json
+          DBT_TARGET: staging
+          DBT_KEYFILE_DEV: ${{ github.workspace }}/sa-staging.json
           DBT_BQ_PROJECT_DEV: ${{ vars.DBT_BQ_PROJECT_DEV }}
-          DBT_BQ_DATASET_STAGING: ${{ vars.DBT_BQ_DATASET_STAGING }}
+          DBT_BQ_DATASET_STAGING: ${{ vars.DBT_BQ_DATASET_STAGING || 'dbt_gpoojary_staging' }}
 
       - name: Remove credentials
         if: always()
-        run: rm -f "${{ github.workspace }}/sa-dev.json" "${{ github.workspace }}/sa-prod.json" 2>/dev/null || true
+        run: rm -f "${{ github.workspace }}/sa-staging.json" "${{ github.workspace }}/sa-prod.json" 2>/dev/null || true
 
   # --- CD Phase: dbt run first (models must exist for tests), then dbt test. Gate = CI must pass before merge. ---
   cd:

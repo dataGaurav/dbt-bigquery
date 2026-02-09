@@ -1,33 +1,28 @@
-# Default target: dev. CI uses staging (staging/temp); CD uses prod.
-# Project/dataset/keyfile use env_var so CI/CD can inject; defaults support local dev.
-# Python models (e.g. is_holiday_2025) need compute_region and gcs_bucket — set DBT_GCS_BUCKET for local runs.
+# Default target: dev (OAuth). CI uses staging (service-account). CD uses prod (service-account).
+# Dev: use gcloud auth application-default login; no keyfile. Staging/prod: service-account keyfile.
 default:
   target: dev
   outputs:
+    # Dev: OAuth via gcloud (no keyfile). Run: gcloud auth application-default login
     dev:
       type: bigquery
       threads: 4
-      method: service-account
-      keyfile: "{{ env_var('DBT_KEYFILE_DEV', '/Users/gaurav/Downloads/Service-Account/data-platforms-team-sandbox-dbt.json') }}"
+      method: oauth
       project: "{{ env_var('DBT_BQ_PROJECT_DEV', 'data-platforms-team-sandbox') }}"
       dataset: "{{ env_var('DBT_BQ_DATASET_DEV', 'dbt_gpoojary') }}"
       location: US
-      # compute_region: "{{ env_var('DBT_COMPUTE_REGION', 'US') }}"
-      # gcs_bucket: "{{ env_var('DBT_GCS_BUCKET', 'data-platforms-team-sandbox-dbt-python') }}"
-      
-    # Staging/temp — same project as dev, different dataset only. Used by CI for dbt compile + dbt test.
-    # staging:
-    #  type: bigquery
-    #  threads: 4
-    #  method: service-account
-    #  keyfile: "{{ env_var('DBT_KEYFILE_DEV', '/Users/gaurav/Downloads/Service-Account/data-platforms-team-sandbox-dbt.json') }}"
-    #  project: "{{ env_var('DBT_BQ_PROJECT_DEV') }}"
-    #  dataset: "{{ env_var('DBT_BQ_DATASET_DEV') }}"
-    #  location: US
-      # compute_region: "{{ env_var('DBT_COMPUTE_REGION', 'US') }}"
-      # gcs_bucket: "{{ env_var('DBT_GCS_BUCKET', 'data-platforms-team-sandbox-dbt-python') }}"
-      ### prod   '/Users/gaurav/Downloads/Service-Account/data-platforms-team-sandbox-84c16172b233.json'
 
+    # Staging: service-account (for CI). Same project as dev, different dataset.
+    staging:
+      type: bigquery
+      threads: 4
+      method: service-account
+      keyfile: "{{ env_var('DBT_KEYFILE_DEV') }}"
+      project: "{{ env_var('DBT_BQ_PROJECT_DEV') }}"
+      dataset: "{{ env_var('DBT_BQ_DATASET_DEV') }}"
+      location: US
+
+    # Prod: service-account (for CD)
     prod:
       type: bigquery
       threads: 4
