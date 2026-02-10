@@ -11,6 +11,8 @@ default:
       project: "{{ env_var('DBT_BQ_PROJECT_DEV', 'data-platforms-team-sandbox') }}"
       dataset: "{{ env_var('DBT_BQ_DATASET_DEV', 'dbt_gpoojary') }}"
       location: US
+      priority: interactive
+      retries: 1
 
     # Staging: service-account (for CI). Same project as dev, different dataset.
     staging:
@@ -21,6 +23,8 @@ default:
       project: "{{ env_var('DBT_BQ_PROJECT_DEV') }}"
       dataset: "{{ env_var('DBT_BQ_DATASET_STAGING') }}"
       location: US
+      priority: interactive
+      retries: 1
 
     # Prod: service-account (for CD)
     prod:
@@ -31,5 +35,7 @@ default:
       project: "{{ env_var('DBT_BQ_PROJECT_PROD') }}"
       dataset: "{{ env_var('DBT_BQ_DATASET_PROD') }}"
       location: US
+      priority: interactive
+      retries: 1
       # compute_region: "{{ env_var('DBT_COMPUTE_REGION', 'US') }}"
       # gcs_bucket: "{{ env_var('DBT_GCS_BUCKET', 'data-platforms-team-sandbox-dbt-python') }}"
